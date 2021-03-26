@@ -3,6 +3,7 @@ services:
   app:
     build: ./docker/go
     tty: true
+    command: "air -c .air.toml"
     ports:
       - "8080:8080"
     volumes:

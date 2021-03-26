@@ -6,6 +6,6 @@ WORKDIR /go/src/work
 
 ADD . /go/src/work
 
-EXPOSE 8080
+RUN apk add --no-cache alpine-sdk git && go get -u github.com/cosmtrek/air
 
-CMD ["go", "run", "main.go"]
+EXPOSE 8080
