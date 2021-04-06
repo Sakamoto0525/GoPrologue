@@ -7,6 +7,8 @@ import (
     "math/rand"
     "net/http"
     "strconv"
+    "fmt"
+    "work/config"
 )
 
 type Book struct {
@@ -25,6 +27,8 @@ var books []Book
 // Get All Books
 func getBooks(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
+    config.Connect()
+    fmt.Sprintf("あいうおえ")
     json.NewEncoder(w).Encode(books)
 }
 
@@ -51,6 +55,11 @@ func createBook(w http.ResponseWriter, r *http.Request) {
     _ = json.NewDecoder(r.Body).Decode(&book)
     book.ID = strconv.Itoa(rand.Intn(10000)) // Mock ID - not safe in production
     books = append(books, book)
+
+    db := config.Connect()
+    db.NewRecord(book)
+    db.Create(&book)
+
     json.NewEncoder(w).Encode(book)
 }
 

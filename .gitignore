@@ -1,3 +1,6 @@
 Memo
 
 tmp
+
+.env.development
+.env.production
