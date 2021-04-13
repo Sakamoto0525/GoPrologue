@@ -1,10 +1,12 @@
 package config
 
-import (   
+import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+  "github.com/joho/godotenv"
   
-  "fmt"
+  "os"
+  "log"
 )
 
 var (
@@ -15,16 +17,21 @@ var (
 // DB接続
 func Connect() *gorm.DB {
 
+  err := godotenv.Load()
+  if err != nil {
+      log.Fatal("Error loading .env file")
+  }
+
   dbms := "mysql"
-  database := "database"
-  user := "user"
-  pass := "password"
+  database := os.Getenv("DB")
+  user := os.Getenv("DB_USER")
+  pass := os.Getenv("DB_PASS")
   protcol := "tcp(db)"
   con := user + ":" + pass + "@" + protcol + "/" + database + "?parseTime=true"
 
   db, err := gorm.Open(dbms, con)
   if err != nil {
-    fmt.Sprintf("DB接続に失敗しました。")
+    log.Fatal("DB接続に失敗しました。")
   }
   
   return db
