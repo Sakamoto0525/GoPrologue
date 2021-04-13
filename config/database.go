@@ -1,11 +1,8 @@
 package config
 
-import (
-	// "os"
-   
+import (   
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
-  // "github.com/joho/godotenv"
   
   "fmt"
 )
@@ -29,26 +26,6 @@ func Connect() *gorm.DB {
   if err != nil {
     fmt.Sprintf("DB接続に失敗しました。")
   }
-
-  // // 実行環境取得
-  // env := os.Getenv("ENV")
-    
-  // if "production" == env {
-  //   env = "production"
-  // } else {
-  //   env = "development"
-  // }
-
-  // // 環境変数取得
-  // godotenv.Load(".env." + env)
-  // godotenv.Load()
-    
-  // // DB接続
-  // db, err = gorm.Open("mysql", os.Getenv("CONNECT"))
-    
-  // if err != nil {
-  //   panic(err)
-  // }
   
   return db
 }
