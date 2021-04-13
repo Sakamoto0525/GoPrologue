@@ -4,18 +4,20 @@ import (
     "github.com/gorilla/mux"
 	"log"
 	"encoding/json"
-    "math/rand"
     "net/http"
-    "strconv"
+    "work/config"
+    "io/ioutil"
+    "github.com/jinzhu/gorm"
 )
 
 type Book struct {
-    ID     string  `json:"id"`
+    gorm.Model
     Title  string  `json:"title"`
     Author *Author `json:"author"`
 }
 
 type Author struct {
+    gorm.Model
     FirstName string `json:"firstname"`
     LastName  string `json:"lastname"`
 }
@@ -25,32 +27,38 @@ var books []Book
 // Get All Books
 func getBooks(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
+
+    db := config.Connect()
+    books := db.Find(&books)
+
     json.NewEncoder(w).Encode(books)
 }
 
 // Get Single Book
 func getBook(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
+   
     params := mux.Vars(r)
+    db := config.Connect()
+    book := db.First(&books, params["id"])
 
-    // Loop through books and find with id
-    for _, item := range books {
-        if item.ID == params["id"] {
-            json.NewEncoder(w).Encode(item)
-            return
-        }
-    }
-    json.NewEncoder(w).Encode(&Book{})
+    json.NewEncoder(w).Encode(book)
 }
 
 // Create a Book
 func createBook(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
 
+    reqBody, _ := ioutil.ReadAll(r.Body)
     var book Book
-    _ = json.NewDecoder(r.Body).Decode(&book)
-    book.ID = strconv.Itoa(rand.Intn(10000)) // Mock ID - not safe in production
-    books = append(books, book)
+    if err := json.Unmarshal(reqBody, &book); err != nil {
+        log.Fatal(err)
+    }
+
+    db := config.Connect()
+    db.NewRecord(book)
+    db.Create(&book)
+
     json.NewEncoder(w).Encode(book)
 }
 
@@ -59,18 +67,16 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
 
     params := mux.Vars(r)
+    reqBody, _ := ioutil.ReadAll(r.Body)
 
-    for index, item := range books {
-        if item.ID == params["id"] {
-            books = append(books[:index], books[index+1:]...)
-            var book Book
-            _ = json.NewDecoder(r.Body).Decode(&book)
-            book.ID = params["id"]
-            books = append(books, book)
-            json.NewEncoder(w).Encode(book)
-            return
-        }
+    var book Book
+    if err := json.Unmarshal(reqBody, &book); err != nil {
+        log.Fatal(err)
     }
+
+    db := config.Connect()
+    db.Model(&book).Where("id = ?", params["id"]).Update(&book)
+
     json.NewEncoder(w).Encode(books)
 }
 
@@ -79,24 +85,18 @@ func deleteBook(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
 
     params := mux.Vars(r)
-
-    for index, item := range books {
-        if item.ID == params["id"] {
-            books = append(books[:index], books[index+1:]...)
-            break
-        }
-    }
-    json.NewEncoder(w).Encode(books)
+    db := config.Connect()
+    db.Delete(&books, params["id"])
 }
 
 func main() {
     // ルーターのイニシャライズ
 	r := mux.NewRouter()
-	
-	// モックデータの作成
-	books = append(books, Book{ID: "1", Title: "Book one", Author: &Author{FirstName: "Philip", LastName: "Williams"}})
-	books = append(books, Book{ID: "2", Title: "Book Two", Author: &Author{FirstName: "John", LastName: "Johnson"}})
-   
+
+    db := config.Connect()
+    db.AutoMigrate(&Book{})
+    db.AutoMigrate(&Author{})
+
     // ルート(エンドポイント)
     r.HandleFunc("/api/books", getBooks).Methods("GET")
     r.HandleFunc("/api/books/{id}", getBook).Methods("GET")
