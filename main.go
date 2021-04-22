@@ -24,7 +24,6 @@ type Author struct {
 
 var books []Book
 
-// Get All Books
 func getBooks(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
 
@@ -34,7 +33,6 @@ func getBooks(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(books)
 }
 
-// Get Single Book
 func getBook(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
    
@@ -45,7 +43,6 @@ func getBook(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(book)
 }
 
-// Create a Book
 func createBook(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
 
@@ -62,7 +59,6 @@ func createBook(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(book)
 }
 
-// Update a Book
 func updateBook(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
 
@@ -80,7 +76,6 @@ func updateBook(w http.ResponseWriter, r *http.Request) {
     json.NewEncoder(w).Encode(books)
 }
 
-// Delete a Book
 func deleteBook(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Content-Type", "application/json")
 
