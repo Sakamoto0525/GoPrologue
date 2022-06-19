@@ -1,11 +1,12 @@
-FROM golang:1.15-alpine
+FROM golang:1.18-alpine
 
-RUN mkdir /go/src/work
+ARG GITHUB_ACCOUNT_NAME
+ARG APP_NAME
 
-WORKDIR /go/src/work
+ENV ROOT=/go/src/${GITHUB_ACCOUNT_NAME}/${APP_NAME}
 
-ADD . /go/src/work
+WORKDIR ${ROOT}
+COPY . .
 
-RUN apk add --no-cache alpine-sdk git && go get -u github.com/cosmtrek/air
-
-EXPOSE 8080
+RUN apk add --no-cache alpine-sdk git && \
+    go install github.com/cosmtrek/air@latest

@@ -3,5 +3,6 @@ Memo
 tmp
 mysql/data
 
+.env
 .env.development
 .env.production

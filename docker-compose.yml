@@ -1,13 +1,17 @@
 version: '3'
 services:
   app:
-    build: ./docker/go
+    build:
+      context: ./docker/go
+      args:
+        GITHUB_ACCOUNT_NAME: ${GITHUB_ACCOUNT_NAME}
+        APP_NAME: ${APP_NAME}
     tty: true
     command: "air -c .air.toml"
     ports:
       - "8080:8080"
     volumes:
-      - .:/go/src/work
+      - .:/go/src/${GITHUB_ACCOUNT_NAME}/${APP_NAME}
 
   db:
     image: mysql:5.7.22
