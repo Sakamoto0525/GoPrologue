@@ -12,6 +12,8 @@ services:
       - "8080:8080"
     volumes:
       - .:/go/src/${GITHUB_ACCOUNT_NAME}/${APP_NAME}
+    depends_on:
+      - db
 
   db:
     image: mysql:5.7.22
@@ -22,14 +24,7 @@ services:
       - ./mysql/init:/docker-entrypoint-initdb.d
       - ./mysql/data:/var/lib/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: database
-
-  proxy:
-      build: ./docker/nginx
-      ports:
-        - 8000:80
-      depends_on:
-        - app
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
